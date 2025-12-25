@@ -17,6 +17,11 @@ int map[10][10] = {
     {1,1,1,1,1,1,1,1,1,1}
 };
 
+int CheckTargetPos(float posX , float posY){
+    int x = floor(posX/64) , y = floor(posY/64);
+    if(map[x][y] > 0)return 0;
+    return 1;
+}
 
 int main(void){
     const int screenWidth = 640;
@@ -49,6 +54,25 @@ int main(void){
                 DrawRectangleLines(screenX,screenY,TILE_SIZE,TILE_SIZE,DARKGRAY);
             }
         }
+        if(IsKeyDown(KEY_W)){
+            if(CheckTargetPos(player.pos.x , player.pos.y - moveSpeed))
+                player.pos.y -= moveSpeed;
+        }
+        if(IsKeyDown(KEY_S)){
+            if(CheckTargetPos(player.pos.x , player.pos.y + moveSpeed))
+                player.pos.y += moveSpeed;
+        }
+        if(IsKeyDown(KEY_D)){
+            if(CheckTargetPos(player.pos.x + moveSpeed , player.pos.y))
+                player.pos.x += moveSpeed;
+        }
+        if(IsKeyDown(KEY_A)){
+            if(CheckTargetPos(player.pos.x - moveSpeed, player.pos.y))
+                player.pos.x -= moveSpeed;
+        }
+        
+        DrawCircle(player.pos.x,player.pos.y , 20 , RED);
+
         EndDrawing();
     }
     CloseWindow();
