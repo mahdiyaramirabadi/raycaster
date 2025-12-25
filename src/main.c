@@ -17,6 +17,17 @@ int map[10][10] = {
     {1,1,1,1,1,1,1,1,1,1}
 };
 
+Player RotateM(Player player ,float rotSpeed, int d){
+    float OldDirX = player.dir.x;
+    player.dir.x = player.dir.x * cos(rotSpeed)  - d * player.dir.y * sin(rotSpeed);
+    player.dir.y = player.dir.y * cos(rotSpeed) + d * OldDirX * sin(rotSpeed);
+
+    float OldPlaneX = player.plane.x;
+    player.plane.x = player.plane.x * cos(rotSpeed)  - d * player.plane.y * sin(rotSpeed);
+    player.plane.y = player.plane.y * cos(rotSpeed) + d * OldPlaneX * sin(rotSpeed);
+    return player;
+}
+
 int CheckTargetPos(float posX , float posY){
     int x = floor(posX/64) , y = floor(posY/64);
     if(map[x][y] > 0)return 0;
@@ -70,9 +81,14 @@ int main(void){
             if(CheckTargetPos(player.pos.x - moveSpeed, player.pos.y))
                 player.pos.x -= moveSpeed;
         }
-        
+        if(IsKeyDown(KEY_RIGHT)){
+            player = RotateM(player , rotSpeed , 1);
+        }
+        if(IsKeyDown(KEY_LEFT)){
+            player = RotateM(player , rotSpeed,  -1);
+        }
         DrawCircle(player.pos.x,player.pos.y , 20 , RED);
-
+        DrawLine(player.pos.x , player.pos.y , player.pos.x + 40*player.dir.x , player.pos.y + 40*player.dir.y, BLUE);
         EndDrawing();
     }
     CloseWindow();
