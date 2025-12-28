@@ -66,20 +66,24 @@ int main(void){
             }
         }
         if(IsKeyDown(KEY_W)){
-            if(CheckTargetPos(player.pos.x , player.pos.y - moveSpeed))
-                player.pos.y -= moveSpeed;
+            if(CheckTargetPos(player.pos.x + moveSpeed * player.dir.x, player.pos.y + moveSpeed * player.dir.y))
+                player.pos.y += moveSpeed * player.dir.y;
+                player.pos.x += moveSpeed * player.dir.x;
         }
         if(IsKeyDown(KEY_S)){
-            if(CheckTargetPos(player.pos.x , player.pos.y + moveSpeed))
-                player.pos.y += moveSpeed;
+            if(CheckTargetPos(player.pos.x - moveSpeed * player.dir.x, player.pos.y - moveSpeed * player.dir.y))
+                player.pos.y -= moveSpeed * player.dir.y;
+                player.pos.x -= moveSpeed * player.dir.x;
         }
         if(IsKeyDown(KEY_D)){
-            if(CheckTargetPos(player.pos.x + moveSpeed , player.pos.y))
-                player.pos.x += moveSpeed;
+            if(CheckTargetPos(player.pos.x + moveSpeed * player.dir.y, player.pos.y + moveSpeed * player.dir.x))
+                player.pos.x += moveSpeed * player.dir.y;
+                player.pos.y += moveSpeed * player.dir.x;
         }
         if(IsKeyDown(KEY_A)){
-            if(CheckTargetPos(player.pos.x - moveSpeed, player.pos.y))
-                player.pos.x -= moveSpeed;
+            if(CheckTargetPos(player.pos.x - moveSpeed * player.dir.y, player.pos.y - moveSpeed * player.dir.x))
+                player.pos.x -= moveSpeed * player.dir.y;
+                player.pos.y -= moveSpeed * player.dir.x;
         }
         if(IsKeyDown(KEY_RIGHT)){
             player = RotateM(player , rotSpeed , 1);
