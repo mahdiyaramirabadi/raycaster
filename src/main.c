@@ -4,17 +4,27 @@
 #include "Player.h"
 
 
-int map[10][10] = {
-    {1,1,1,1,1,1,1,1,1,1},
-    {1,0,0,0,0,0,0,0,0,1},
-    {1,0,0,0,0,0,0,0,0,1},
-    {1,0,0,0,0,0,0,0,0,1},
-    {1,0,0,0,1,1,1,0,0,1},
-    {1,0,0,0,0,0,1,0,0,1},
-    {1,0,0,0,0,0,1,0,0,1},
-    {1,0,0,0,0,0,1,0,0,1},
-    {1,0,0,0,0,0,0,0,0,1},
-    {1,1,1,1,1,1,1,1,1,1}
+int map[20][20] = {
+    {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
+    {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+    {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+    {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1},
+    {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,0,1},
+    {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,1},
+    {1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,1,0,0,0,1},
+    {1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,1},
+    {1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,1},
+    {1,0,0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,0,0,1},
+    {1,0,0,0,0,0,0,1,0,0,0,1,0,0,0,0,0,0,0,1},
+    {1,0,0,0,0,0,0,1,0,0,1,1,0,0,0,0,0,0,0,1},
+    {1,0,0,0,0,0,0,1,0,1,1,0,0,0,0,0,0,0,0,1},
+    {1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1},
+    {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+    {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+    {1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1,1,0,1},
+    {1,0,0,0,0,0,0,0,0,0,0,1,0,1,1,0,0,0,0,1},
+    {1,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,1},
+    {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
 };
 
 Player RotateM(Player player ,float rotSpeed, int d){
@@ -29,17 +39,18 @@ Player RotateM(Player player ,float rotSpeed, int d){
 }
 
 int CheckTargetPos(float posX , float posY){
-    int x = floor(posX/64) , y = floor(posY/64);
-    if(map[x][y] > 0)return 0;
+    int x = floor(posX/32) , y = floor(posY/32);
+    printf("%f %f # %d %d %d\n",posX,posY,x,y,map[y][x]);
+    if(map[y][x] > 0)return 0;
     return 1;
 }
 
 int main(void){
     const int screenWidth = 640;
     const int screenHeight = 640;
-    const int TILE_SIZE = 64;
-    const int MAP_WIDTH = 10;
-    const int MAP_HEIGHT = 10;
+    const int TILE_SIZE = 32;
+    const int MAP_WIDTH = 20;
+    const int MAP_HEIGHT = 20;
     Player player;
     player.pos.x = 1 * TILE_SIZE;
     player.pos.y = 1 * TILE_SIZE;
@@ -53,11 +64,11 @@ int main(void){
         float rotSpeed = 5.0 * dt;
         BeginDrawing();
         ClearBackground(RAYWHITE);
-        for(int x=0;x<MAP_WIDTH;x++){
-            for(int y=0;y<MAP_HEIGHT;y++){
+        for(int y=0;y<MAP_HEIGHT;y++){
+            for(int x=0;x<MAP_WIDTH;x++){
                 int screenX = x * TILE_SIZE;
                 int screenY = y * TILE_SIZE;
-                if(map[x][y] > 0){
+                if(map[y][x] > 0){
                     DrawRectangle(screenX,screenY,TILE_SIZE,TILE_SIZE,WHITE);
                 }else{
                     DrawRectangle(screenX,screenY,TILE_SIZE,TILE_SIZE,BLACK);
@@ -67,23 +78,23 @@ int main(void){
         }
         if(IsKeyDown(KEY_W)){
             if(CheckTargetPos(player.pos.x + moveSpeed * player.dir.x, player.pos.y + moveSpeed * player.dir.y))
-                player.pos.y += moveSpeed * player.dir.y;
-                player.pos.x += moveSpeed * player.dir.x;
+               { player.pos.y += moveSpeed * player.dir.y;
+                player.pos.x += moveSpeed * player.dir.x;}
         }
         if(IsKeyDown(KEY_S)){
             if(CheckTargetPos(player.pos.x - moveSpeed * player.dir.x, player.pos.y - moveSpeed * player.dir.y))
-                player.pos.y -= moveSpeed * player.dir.y;
-                player.pos.x -= moveSpeed * player.dir.x;
+                {player.pos.y -= moveSpeed * player.dir.y;
+                player.pos.x -= moveSpeed * player.dir.x;}
         }
         if(IsKeyDown(KEY_D)){
             if(CheckTargetPos(player.pos.x + moveSpeed * player.dir.y, player.pos.y + moveSpeed * player.dir.x))
-                player.pos.x += moveSpeed * player.dir.y;
-                player.pos.y += moveSpeed * player.dir.x;
+                {player.pos.x += moveSpeed * player.dir.y;
+                player.pos.y += moveSpeed * player.dir.x;}
         }
         if(IsKeyDown(KEY_A)){
             if(CheckTargetPos(player.pos.x - moveSpeed * player.dir.y, player.pos.y - moveSpeed * player.dir.x))
-                player.pos.x -= moveSpeed * player.dir.y;
-                player.pos.y -= moveSpeed * player.dir.x;
+                {player.pos.x -= moveSpeed * player.dir.y;
+                player.pos.y -= moveSpeed * player.dir.x;}
         }
         if(IsKeyDown(KEY_RIGHT)){
             player = RotateM(player , rotSpeed , 1);
@@ -91,8 +102,8 @@ int main(void){
         if(IsKeyDown(KEY_LEFT)){
             player = RotateM(player , rotSpeed,  -1);
         }
-        DrawCircle(player.pos.x,player.pos.y , 20 , RED);
-        DrawLine(player.pos.x , player.pos.y , player.pos.x + 40*player.dir.x , player.pos.y + 40*player.dir.y, BLUE);
+        DrawCircle(player.pos.x,player.pos.y , 10 , RED);
+        DrawLine(player.pos.x , player.pos.y , player.pos.x + 20*player.dir.x , player.pos.y + 20*player.dir.y, BLUE);
         EndDrawing();
     }
     CloseWindow();
