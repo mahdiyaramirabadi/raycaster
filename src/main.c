@@ -46,36 +46,23 @@ int CheckTargetPos(float posX , float posY){
 }
 
 int main(void){
-    const int screenWidth = 640;
-    const int screenHeight = 640;
+    const int screenWidth = 1200;
+    const int screenHeight = 800;
     const int TILE_SIZE = 32;
     const int MAP_WIDTH = 20;
     const int MAP_HEIGHT = 20;
     Player player;
     player.pos.x = 1 * TILE_SIZE;
     player.pos.y = 1 * TILE_SIZE;
-    player.dir.x = 1;
-    player.dir.y = 0;
+    player.dir.x = -1.0;
+    player.dir.y = 0.0;
+    player.plane.x = 0.0;player.plane.y = 0.66;
     InitWindow(screenWidth,screenHeight,"Raycaster");
     SetTargetFPS(60);
     while(!WindowShouldClose()){
         float dt = GetFrameTime();
         float moveSpeed = 100.0 * dt;
         float rotSpeed = 5.0 * dt;
-        BeginDrawing();
-        ClearBackground(RAYWHITE);
-        for(int y=0;y<MAP_HEIGHT;y++){
-            for(int x=0;x<MAP_WIDTH;x++){
-                int screenX = x * TILE_SIZE;
-                int screenY = y * TILE_SIZE;
-                if(map[y][x] > 0){
-                    DrawRectangle(screenX,screenY,TILE_SIZE,TILE_SIZE,WHITE);
-                }else{
-                    DrawRectangle(screenX,screenY,TILE_SIZE,TILE_SIZE,BLACK);
-                }
-                DrawRectangleLines(screenX,screenY,TILE_SIZE,TILE_SIZE,DARKGRAY);
-            }
-        }
         if(IsKeyDown(KEY_W)){
             if(CheckTargetPos(player.pos.x + moveSpeed * player.dir.x, player.pos.y + moveSpeed * player.dir.y))
                { player.pos.y += moveSpeed * player.dir.y;
@@ -97,13 +84,78 @@ int main(void){
                 player.pos.y -= moveSpeed * player.dir.x;}
         }
         if(IsKeyDown(KEY_RIGHT)){
-            player = RotateM(player , rotSpeed , 1);
+            player = RotateM(player , rotSpeed , -1);
         }
         if(IsKeyDown(KEY_LEFT)){
-            player = RotateM(player , rotSpeed,  -1);
+            player = RotateM(player , rotSpeed,  1);
         }
-        DrawCircle(player.pos.x,player.pos.y , 10 , RED);
-        DrawLine(player.pos.x , player.pos.y , player.pos.x + 20*player.dir.x , player.pos.y + 20*player.dir.y, BLUE);
+        BeginDrawing();
+        ClearBackground(BLACK);
+    
+        for(int x=0;x<screenWidth;x++){
+            double cameraX = 2 * (x / (double)screenWidth) - 1;
+            double rayDirX = player.dir.x + player.plane.x * cameraX;
+            double rayDirY = player.dir.y + player.plane.y * cameraX;
+
+            int mapX = floor(player.pos.x/TILE_SIZE), mapY = floor(player.pos.y/TILE_SIZE);
+            double posX = player.pos.x / TILE_SIZE , posY = player.pos.y / TILE_SIZE;
+
+            double sideDistX , sideDistY;
+
+            double deltaDistX = (rayDirX == 0) ? 1e30 : fabs(1 / rayDirX);
+            double deltaDistY = (rayDirY == 0) ? 1e30 : fabs(1 / rayDirY);
+            double perpWallDist;
+
+            int stepX , stepY;
+
+            // DDA
+            int hit = 0;
+            int side;
+
+             if (rayDirX < 0) {
+                stepX = -1;
+                sideDistX = (posX - mapX) * deltaDistX;
+            } else {
+                stepX = 1;
+                sideDistX = (mapX + 1.0 - posX ) * deltaDistX;
+            }
+            if (rayDirY < 0) {
+                stepY = -1;
+                sideDistY = (posY - mapY) * deltaDistY;
+            } else {
+                stepY = 1;
+                sideDistY = (mapY + 1.0 - posY) * deltaDistY;
+            }
+
+            while(!hit){
+                if(sideDistX < sideDistY){
+                    sideDistX += deltaDistX;
+                    mapX += stepX;
+                    side = 0;
+                }else{
+                    sideDistY += deltaDistY;
+                    mapY += stepY;
+                    side = 1;
+                }
+                if(map[mapY][mapX])hit = 1;
+            }
+
+            if(side == 0)perpWallDist = (sideDistX - deltaDistX);
+            else perpWallDist = (sideDistY - deltaDistY);
+
+            int lineHeight = (int)(screenHeight / perpWallDist);
+
+            int drawStart = screenHeight / 2 - lineHeight / 2;
+            if(drawStart < 0)drawStart = 0;
+            int drawEnd = screenHeight / 2 + lineHeight / 2;
+            if(drawEnd > screenHeight)drawEnd = screenHeight - 1;
+            Color color = GRAY;
+            if(side == 1)color = DARKGRAY;
+            DrawLine(x , 0 , x , drawStart , SKYBLUE);
+            DrawLine(x , drawStart , x , drawEnd , color);
+            DrawLine(x ,drawEnd , x,screenHeight,BLACK);
+        }
+
         EndDrawing();
     }
     CloseWindow();
