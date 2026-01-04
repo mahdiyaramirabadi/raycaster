@@ -6,6 +6,7 @@
 typedef struct
 {
     Vector2 pos;
+    Vector2 map_pos;
     Vector2 dir;
     Vector2 plane;
 }Player;
